@@ -1,6 +1,6 @@
 # valcrypt [![](https://img.shields.io/badge/version-1.0.0-green.svg)]()
 
-r-value encryption, compile-time and based on intrins. single-header and easy-to-use call
+values encryption, compile-time and based on intrins. single-header and easy-to-use call
 
 ## Hide your important data
 ```cpp
@@ -40,7 +40,7 @@ And as expected the output is:
 | `VALCRYPT_NO_FORCEINLINE`                 | disables force inlining                                                                 |
 
 At the compilation-time `xor` operations are performed on `value`, during run-time the same `xor` operations are performed on `value` again, but based on intrins (SSE/AVX). 
-This repository is designed to make it a little more difficult for a reverse engineer to analyze your program, as well as to protect important r-value int constants.
+This repository is designed to make it a little more difficult for a reverse engineer to analyze your program, as well as to protect important int constants.
 
 ## IDA Pseudocode Output (code from example) - SSE
 ```c
