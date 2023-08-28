@@ -3,6 +3,7 @@
 values encryption, compile-time and based on intrins. single-header and easy-to-use call
 
 Сurrently supports: MSVC
+
 Arch: `x64` & `x86`
 
 ## Hide your important data
