@@ -8,7 +8,7 @@
 * again, but based on intrins (SSE/AVX).
 * This repository is designed to make it a little more difficult
 * for a reverse engineer to analyze your program, as well as to
-* protect important r-value int constants.
+* protect important int constants.
 */
 
 #ifndef _VALUE_CRYPT_
@@ -84,7 +84,7 @@ namespace val_crypt {
 
     namespace detail 
     {
-        template <class _Type, _Type rvalue>
+        template <class _Type, _Type value>
         class const_encryptor 
         {
         public:
@@ -95,7 +95,7 @@ namespace val_crypt {
 
             constexpr VALCRYPT_FORCEINLINE _Type encrypt()
             {
-                _Type val = rvalue;
+                _Type val = value;
 
                 for (auto i = 1; i <= CRYPTO_LOOP; ++i)
                 {
@@ -108,7 +108,7 @@ namespace val_crypt {
 
             VALCRYPT_FORCEINLINE const _Type get() const noexcept(true)
             {
-                return rvalue;
+                return value;
             }
 
             VALCRYPT_FORCEINLINE _Type crypt_get() noexcept(true)
