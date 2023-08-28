@@ -4,8 +4,8 @@ r-value encryption, compile-time and based on intrins. single-header and easy-to
 
 ## Hide your important data
 ```cpp
-sockaddr_in serverAddress;
-serverAddress.sin_port = htons(valcrypt(12345u));
+sockaddr_in my_socket;
+my_socket.sin_port = htons(valcrypt(12345u));
 ```
 
 ## Simple example
@@ -42,7 +42,7 @@ And as expected the output is:
 At the compilation-time `xor` operations are performed on `value`, during run-time the same `xor` operations are performed on `value` again, but based on intrins (SSE/AVX). 
 This repository is designed to make it a little more difficult for a reverse engineer to analyze your program, as well as to protect important r-value int constants.
 
-## IDA Pro Pseudocode Output (code from example)
+## IDA Pseudocode Output (code from example) - SSE
 ```c
 int __cdecl main(int argc, const char **argv, const char **envp)
 {
@@ -87,6 +87,71 @@ int __cdecl main(int argc, const char **argv, const char **envp)
   v12 = sub_140001150(std::cout, v5, 952968912i64);
   v13 = std::ostream::operator<<(v12, v3);
   std::ostream::operator<<(v13, sub_140001300);
+  return 0;
+}
+```
+
+## IDA Pseudocode Output (code from example) - AVX
+```c
+int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  unsigned int v6; // ebx
+  int i; // eax
+  __int64 v25; // rax
+  __int64 v26; // rax
+
+  v6 = 29495662;
+  for ( i = 1; i <= 7; ++i )
+  {
+    _ECX = -1619594369 * i;
+    __asm { vmovd   xmm0, ecx }
+    _ECX = 952968912 * i;
+    __asm
+    {
+      vpshufd xmm0, xmm0, 0
+      vinsertf128 ymm0, ymm0, xmm0, 1
+      vmovd   edx, xmm0
+      vmovd   xmm1, ecx
+      vpshufd xmm1, xmm1, 0
+      vinsertf128 ymm1, ymm1, xmm1, 1
+      vmovd   ecx, xmm1
+    }
+    if ( _ECX != (_DWORD)argv )
+    {
+      __asm
+      {
+        vmovd   xmm0, ecx
+        vmovd   xmm2, edx
+        vpshufd xmm2, xmm2, 0
+        vinsertf128 ymm2, ymm2, xmm2, 1
+        vpshufd xmm0, xmm0, 0
+        vinsertf128 ymm0, ymm0, xmm0, 1
+        vpandn  ymm1, ymm0, ymm2
+        vpandn  ymm0, ymm2, ymm0
+        vpor    ymm2, ymm0, ymm1
+        vmovd   ecx, xmm2
+      }
+    }
+    if ( _ECX != 952968912 )
+    {
+      __asm
+      {
+        vmovdqu ymm0, cs:ymmword_1400032E0
+        vmovd   xmm2, ecx
+        vpshufd xmm2, xmm2, 0
+        vinsertf128 ymm2, ymm2, xmm2, 1
+        vpandn  ymm1, ymm0, ymm2
+        vpandn  ymm0, ymm2, ymm0
+        vpor    ymm2, ymm0, ymm1
+        vmovd   ecx, xmm2
+      }
+    }
+    v6 ^= _ECX;
+  }
+  __asm { vzeroupper }
+  v25 = sub_140001160(std::cout, argv, envp);
+  v26 = std::ostream::operator<<(v25, v6);
+  std::ostream::operator<<(v26, sub_140001310);
   return 0;
 }
 ```
